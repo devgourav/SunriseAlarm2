@@ -1,0 +1,7 @@
+<resources>
+  <string name="app_name">SunriseAlarm2</string>
+  <string name="pref_title_ringtone">Ringtone</string>
+  <string name="pref_ringtone_silent">Silent</string>
+  <string name="pref_title_vibrate">Vibrate</string>
+  <string name="activity_btn_transition">transition</string>
+</resources>

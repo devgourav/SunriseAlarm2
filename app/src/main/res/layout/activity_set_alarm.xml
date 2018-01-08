@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/activity_set_alarm"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="vertical"
+  android:padding="10dp"
+  tools:context="com.beeblebroxlabs.sunrisealarm2.presentation.ui.activity.SetAlarmActivity">
+
+  <EditText
+    android:id="@+id/alarmLabelEditText"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/textPadding"
+    android:layout_marginTop="@dimen/topMargin"
+    android:background="@android:color/darker_gray"
+    android:fontFamily="sans-serif-condensed"
+    android:textSize="@dimen/textSizeSmall"
+    android:hint="Alarm Label"
+    android:inputType="text" />
+
+  <Button
+    android:id="@+id/ringtoneButton"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/topMargin"
+    android:textSize="@dimen/textSizeSmall"
+    android:fontFamily="sans-serif-condensed"
+    android:textAlignment="viewStart"
+    android:background="@color/colorPrimary"
+    android:textColor="@color/ColorTextDark"
+    android:paddingStart="@dimen/textPadding"
+    android:text="Choose Ringtone" />
+
+  <Switch
+    android:id="@+id/sunriseTimeSwitch"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fontFamily="sans-serif-condensed"
+    android:textSize="@dimen/textSizeSmall"
+    android:layout_marginTop="@dimen/topMargin"/>
+
+  <TextView
+    android:id="@+id/sunriseTimeTextView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:fontFamily="sans-serif-condensed"
+    android:textSize="@dimen/textSizeSmall"/>
+
+
+  <Switch
+    android:id="@+id/customTimeSwitch"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/topMargin"
+    android:fontFamily="sans-serif-condensed"
+    android:textSize="@dimen/textSizeSmall" />
+
+  <ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TimePicker
+      android:id="@+id/timePicker"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/topMargin"
+      android:timePickerMode="spinner" />
+  </ScrollView>
+
+</LinearLayout>

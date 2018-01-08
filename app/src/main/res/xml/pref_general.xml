@@ -1,0 +1,28 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <SwitchPreference
+    android:defaultValue="false"
+    android:fontFamily="sans-serif-condensed"
+    android:textSize="20sp"
+    android:key="24hourClock"
+    android:summary="Default is 12 hour Clock"
+    android:title="Enable 24 hour Clock" />
+
+  <RingtonePreference
+    android:defaultValue="default"
+    android:textSize="20sp"
+    android:key="default_alarmTone"
+    android:ringtoneType="alarm"
+    android:title="Default AlarmTone" />
+
+
+  <SwitchPreference
+    android:defaultValue="false"
+    android:fontFamily="sans-serif-condensed"
+    android:textSize="20sp"
+    android:key="temperatureUnit"
+    android:summary="Default is Metric(Celsius)"
+    android:title="Use Emperical Unit(Fahrenheit)" />
+
+
+</PreferenceScreen>
