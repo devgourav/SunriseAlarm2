@@ -40,6 +40,6 @@ public class CurrentWeather {
 
   @Override
   public String toString() {
-    return weather.get(0).toString() + ":" + main.toString() + ":" + sys.toString() + ":" + name.toString() ;
+    return weather.get(0).toString() + ":" + main.toString() + ":" + sys.toString() + ":" + name ;
   }
 }

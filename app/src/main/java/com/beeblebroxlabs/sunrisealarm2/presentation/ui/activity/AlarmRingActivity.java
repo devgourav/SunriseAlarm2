@@ -1,43 +1,32 @@
 package com.beeblebroxlabs.sunrisealarm2.presentation.ui.activity;
 
 import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 
-import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
-import android.os.PersistableBundle;
-import android.provider.ContactsContract.RawContacts.Data;
-import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.TextClock;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-
-import com.airbnb.lottie.LottieAnimationView;
 import com.beeblebroxlabs.sunrisealarm2.R;
 import com.beeblebroxlabs.sunrisealarm2.logic.AlarmBroadcastReceiver;
 import com.beeblebroxlabs.sunrisealarm2.logic.AlarmRingtonePlayingService;
 import com.beeblebroxlabs.sunrisealarm2.repository.local.Alarm;
 import com.beeblebroxlabs.sunrisealarm2.repository.local.AlarmDatabase;
-import java.io.Serializable;
 import timber.log.BuildConfig;
 import timber.log.Timber;
 import timber.log.Timber.DebugTree;
@@ -64,7 +53,7 @@ public class AlarmRingActivity extends AppCompatActivity {
 
   Intent alarmRingtoneService;
   Alarm alarm;
-  AlarmDatabase alarmDatabase;
+  protected static WakeLock wakeLock = null;
 
 
   @Override
@@ -73,8 +62,14 @@ public class AlarmRingActivity extends AppCompatActivity {
 
     //For full screen
     requestWindowFeature(Window.FEATURE_NO_TITLE);
-    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-        WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    getWindow().addFlags(LayoutParams.FLAG_TURN_SCREEN_ON);
+    getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
+    getWindow().addFlags(LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+
+    PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+    wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "DoNotSleep");
+    wakeLock.acquire();
+
 
 
     setContentView(R.layout.activity_alarm_ring);
@@ -94,15 +89,10 @@ public class AlarmRingActivity extends AppCompatActivity {
     if(alarm.getLabel() != null){
       ringLabelText.setText(alarm.getLabel());
     }else{
-      ringLabelText.setText("Default text");
+      ringLabelText.setText(" ");
     }
 
-    LottieAnimationView animationView = (LottieAnimationView) findViewById(R.id.animation_view);
-    animationView.setAnimation("hello-world.json");
-    animationView.loop(true);
-    animationView.playAnimation();
-
-    alarmDatabase = AlarmDatabase.getInstance(this);
+    snoozeButton.setText("Snooze for "+SNOOZE_TIME/60000+" minutes");
 
   }
 
@@ -138,7 +128,7 @@ public class AlarmRingActivity extends AppCompatActivity {
   public void silentButtonListener(){
     stopService(alarmRingtoneService);
 
-    if(alarm.getRepeated()==FALSE){
+    if(alarm.getRepeated()==0){
       alarm.setEnabled(FALSE);
       new DatabaseDelete(this,alarm).execute();
     }
@@ -160,9 +150,9 @@ public class AlarmRingActivity extends AppCompatActivity {
     AlarmDatabase alarmDatabase;
 
 
-    public DatabaseDelete(Context mContext, Alarm alarm) {
+    public DatabaseDelete(Context context, Alarm alarm) {
       this.alarm = alarm;
-      this.mContext = mContext;
+      this.mContext = context.getApplicationContext();
     }
 
     @Override
@@ -173,15 +163,21 @@ public class AlarmRingActivity extends AppCompatActivity {
     }
   }
 
-    private static class DatabaseUpdate extends AsyncTask<Void,Void,Void> {
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    wakeLock.release();
+  }
+
+  private static class DatabaseUpdate extends AsyncTask<Void,Void,Void> {
       Alarm alarm;
       Context mContext;
       AlarmDatabase alarmDatabase;
 
 
-      public DatabaseUpdate(Context mContext,Alarm alarm) {
+      public DatabaseUpdate(Context context,Alarm alarm) {
         this.alarm = alarm;
-        this.mContext = mContext;
+        this.mContext = context.getApplicationContext();
       }
 
       @Override

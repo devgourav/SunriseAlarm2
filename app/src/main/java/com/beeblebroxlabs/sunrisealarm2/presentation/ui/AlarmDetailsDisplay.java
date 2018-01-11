@@ -1,6 +1,5 @@
 package com.beeblebroxlabs.sunrisealarm2.presentation.ui;
 
-import android.util.Log;
 import java.util.Calendar;
 
 /**
@@ -13,11 +12,11 @@ public class AlarmDetailsDisplay {
   public static final long DAYS_IN_MILLIS = HOUR_IN_MILLIS * 24;
 
   private Long ringTime;
-  private Boolean isRepeating;
+  private int repeated;
 
-  public AlarmDetailsDisplay(Long ringTime,Boolean isRepeating){
+  public AlarmDetailsDisplay(Long ringTime,int repeated){
     this.ringTime = ringTime;
-    this.isRepeating = isRepeating;
+    this.repeated = repeated;
   }
 
   public String getAlarmDetailsText(){
@@ -43,12 +42,24 @@ public class AlarmDetailsDisplay {
     hourLeft = (timeDifference % DAYS_IN_MILLIS) / HOUR_IN_MILLIS;
     minuteLeft = (timeDifference % HOUR_IN_MILLIS) / MIN_IN_MILLIS;
 
-    String isRepeat = isRepeating?"Repeating":"Once";
+    String repeatText="";
+
+    switch (repeated){
+      case 0:
+        repeatText="Once";
+        break;
+      case 1:
+        repeatText="MON|TUE|WED|THUR|FRI";
+        break;
+      case 2:
+        repeatText="SAT|SUN";
+        break;
+    }
 
     if(dayLeft>0){
-      return "Alarm in "+dayLeft+" days "+hourLeft+" hours "+minuteLeft+" minutes " +isRepeat;
+      return "Alarm in "+dayLeft+" days "+hourLeft+" hours "+minuteLeft+" minutes " + repeatText;
     }else{
-      return "Alarm in "+hourLeft+" hours "+minuteLeft+" minutes " +isRepeat;
+      return "Alarm in "+hourLeft+" hours "+minuteLeft+" minutes " +repeatText;
     }
   }
 

@@ -5,57 +5,108 @@
   android:layout_width="match_parent"
   android:layout_height="match_parent"
   android:orientation="vertical"
-  android:padding="10dp"
+  android:padding="20dp"
   tools:context="com.beeblebroxlabs.sunrisealarm2.presentation.ui.activity.SetAlarmActivity">
 
   <EditText
     android:id="@+id/alarmLabelEditText"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="@dimen/textPadding"
-    android:layout_marginTop="@dimen/topMargin"
-    android:background="@android:color/darker_gray"
-    android:fontFamily="sans-serif-condensed"
+    android:layout_height="40dp"
     android:textSize="@dimen/textSizeSmall"
+    android:background="@android:color/transparent"
     android:hint="Alarm Label"
+    android:cursorVisible="false"
     android:inputType="text" />
 
-  <Button
-    android:id="@+id/ringtoneButton"
+  <View
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/topMargin"
-    android:textSize="@dimen/textSizeSmall"
-    android:fontFamily="sans-serif-condensed"
-    android:textAlignment="viewStart"
-    android:background="@color/colorPrimary"
-    android:textColor="@color/ColorTextDark"
-    android:paddingStart="@dimen/textPadding"
-    android:text="Choose Ringtone" />
+    android:layout_height="1dp"
+    android:background="@android:color/darker_gray"
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp"/>
+
+
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:layout_gravity="top|center_horizontal"
+    android:orientation="horizontal"
+    android:weightSum="2.0">
+    <Button
+      android:id="@+id/ringtoneButton"
+      android:layout_width="wrap_content"
+      android:layout_height="match_parent"
+      android:layout_weight="0.5"
+      android:textSize="@dimen/textSizeExtraSmall"
+      android:textColor="@color/ColorTextDark"
+      android:gravity="center_vertical"
+      android:background="@android:color/transparent"
+      android:text="Choose Ringtone" />
+
+    <TextView
+      android:id="@+id/ringtoneNameTextView"
+      android:layout_width="wrap_content"
+      android:layout_height="match_parent"
+      android:layout_weight="1.5"
+      android:gravity="center_vertical"
+      android:textAlignment="center"
+      android:text="Default"
+      android:textSize="@dimen/textSizeExtraSmall" />
+  </LinearLayout>
+
+  <View
+    android:layout_width="match_parent"
+    android:layout_height="1dp"
+    android:background="@android:color/darker_gray"
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp"/>
+
+
+  <Spinner
+    android:id="@+id/repeatSpinner"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:dropDownWidth="match_parent"
+    android:foregroundGravity="center"
+    android:spinnerMode="dialog"
+    android:prompt="@string/repeat"
+    android:splitMotionEvents="false"
+    android:textSize="@dimen/textSizeSmall" />
+
+  <View
+    android:layout_width="match_parent"
+    android:layout_height="1dp"
+    android:background="@android:color/darker_gray"
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp"/>
 
   <Switch
     android:id="@+id/sunriseTimeSwitch"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:fontFamily="sans-serif-condensed"
-    android:textSize="@dimen/textSizeSmall"
-    android:layout_marginTop="@dimen/topMargin"/>
+    android:layout_height="40dp"
+
+    android:textSize="@dimen/textSizeSmall" />
 
   <TextView
     android:id="@+id/sunriseTimeTextView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="10dp"
-    android:fontFamily="sans-serif-condensed"
-    android:textSize="@dimen/textSizeSmall"/>
+    android:textSize="@dimen/textSizeExtraSmall"/>
+
+  <View
+    android:layout_width="match_parent"
+    android:layout_height="1dp"
+    android:background="@android:color/darker_gray"
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp"/>
 
 
   <Switch
     android:id="@+id/customTimeSwitch"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/topMargin"
-    android:fontFamily="sans-serif-condensed"
+    android:layout_height="40dp"
+
     android:textSize="@dimen/textSizeSmall" />
 
   <ScrollView

@@ -3,13 +3,10 @@ package com.beeblebroxlabs.sunrisealarm2.presentation.ui.adapter;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
-
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Switch;
 import android.widget.TextView;
 import butterknife.BindView;
@@ -62,8 +59,7 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
         parent.getContext());
     View v =
         inflater.inflate(R.layout.view_alarm_element, parent, false);
-    ViewHolder viewHolder = new ViewHolder(v);
-    return viewHolder;
+    return new ViewHolder(v);
   }
 
   @Override
@@ -76,12 +72,8 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
       holder.alarmSwitch.setChecked(FALSE);
     }
 
-    holder.alarmSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-      @Override
-      public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        Timber.d("Alarm has been disabled");
-      }
-    });
+    holder.alarmSwitch.setOnCheckedChangeListener(
+        (buttonView, isChecked) -> Timber.d("Alarm has been disabled"));
   }
 
   @Override

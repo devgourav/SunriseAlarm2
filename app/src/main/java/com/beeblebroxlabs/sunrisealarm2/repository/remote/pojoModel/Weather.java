@@ -2,7 +2,6 @@ package com.beeblebroxlabs.sunrisealarm2.repository.remote.pojoModel;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import java.util.List;
 
 /**
  * Created by devgr on 02-Dec-17.

@@ -16,7 +16,8 @@
     android:name=".SunriseApplication"
     android:roundIcon="@mipmap/ic_launcher_round"
     android:supportsRtl="true"
-    android:theme="@style/AppTheme">
+    android:theme="@style/AppTheme"
+    android:fullBackupContent="@xml/backup_descriptor">
 
 
     <activity android:name=".presentation.ui.activity.MainActivity">
@@ -28,7 +29,10 @@
 
 
     <activity android:name=".presentation.ui.activity.SetAlarmActivity" />
-    <activity android:name=".presentation.ui.activity.AlarmRingActivity"/>
+    <activity
+      android:name=".presentation.ui.activity.AlarmRingActivity"
+      android:configChanges="orientation|keyboardHidden|screenSize"
+      android:theme="@style/Theme.AppCompat.NoActionBar"/>
     <activity android:name=".presentation.ui.activity.SettingsActivity"/>
 
     <service
@@ -37,11 +41,13 @@
 
     <receiver
       android:enabled="true"
-      android:exported="true"
       android:name=".logic.AlarmBroadcastReceiver"
       android:process=":remote">
+    </receiver>
+    <receiver android:name=".logic.AlarmBootReceiver"
+      android:enabled="true">
       <intent-filter>
-        <action android:name="android.intent.action.BOOT_COMPLETED" />
+        <action android:name="android.intent.action.BOOT_COMPLETED"/>
       </intent-filter>
     </receiver>
   </application>

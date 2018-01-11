@@ -5,12 +5,10 @@ import static java.lang.Boolean.TRUE;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnPreparedListener;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import com.beeblebroxlabs.sunrisealarm2.logic.util.RingtoneNamePathUtil;
 import java.io.IOException;
 import timber.log.Timber;
@@ -36,11 +34,13 @@ public class AlarmRingtonePlayingService extends Service {
 
     String alarmTunePath = intent.getExtras().getString("tunePath");
 
-    Timber.d("alarmTunePath:"+alarmTunePath);
+    Timber.d("alarmTunePath:%s",alarmTunePath);
 
     if(alarmTunePath!=null){
       Uri uri = Uri.parse(alarmTunePath);
-      alarmTunePath = pathUtil.getRingtonePathFromContentUri(uri);
+      if(alarmTunePath.contains("media")){
+        alarmTunePath = pathUtil.getRingtonePathFromContentUri(uri);
+      }
     }else{
       Uri uri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
       alarmTunePath = uri.toString();

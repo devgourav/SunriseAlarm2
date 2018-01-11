@@ -3,7 +3,6 @@ package com.beeblebroxlabs.sunrisealarm2.presentation.viewmodel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.ViewModel;
-import android.support.annotation.NonNull;
 import com.beeblebroxlabs.sunrisealarm2.repository.remote.ApiResponse;
 import com.beeblebroxlabs.sunrisealarm2.repository.remote.WeatherRepository;
 import com.beeblebroxlabs.sunrisealarm2.repository.remote.WeatherRepositoryImpl;

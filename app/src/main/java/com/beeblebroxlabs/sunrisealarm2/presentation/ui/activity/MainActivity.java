@@ -4,10 +4,7 @@ import static com.google.android.gms.location.LocationRequest.PRIORITY_LOW_POWER
 import static java.lang.Boolean.FALSE;
 
 import android.Manifest.permission;
-import android.annotation.SuppressLint;
-import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProviders;
-import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,24 +14,20 @@ import android.location.Location;
 import android.net.http.HttpResponseCache;
 import android.os.AsyncTask;
 import android.os.Build.VERSION;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.TextClock;
 import android.widget.TextView;
-import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.beeblebroxlabs.sunrisealarm2.R;
@@ -53,7 +46,6 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -89,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements DeleteDialogFragm
   RecyclerView recyclerView;
   RecyclerView.Adapter mAdapter;
   RecyclerView.LayoutManager mLayoutManager;
+  DividerItemDecoration dividerItemDecoration;
 
 
 
@@ -134,6 +127,8 @@ public class MainActivity extends AppCompatActivity implements DeleteDialogFragm
     startLocationService();
     checkTimeFormat();
     showAlarmList();
+
+
   }
 
 
@@ -156,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements DeleteDialogFragm
             editor.remove("sunriseTime");
           }
           editor.putLong("sunriseTime",weather.getSys().getSunrise());
-          editor.commit();
+          editor.apply();
         }
       });
   }
@@ -198,22 +193,26 @@ public class MainActivity extends AppCompatActivity implements DeleteDialogFragm
 
 
     viewModel = ViewModelProviders.of(this).get(ShowAlarmViewModel.class);
-    viewModel.getAlarms().observe(this,alarms -> {
-      if(alarms.size()>0){
-        Timber.d(alarms.size()+"alarms set currently");
+    viewModel.getAlarms().observe(this, alarms -> {
+      if (alarms.size() > 0) {
+        Timber.d("alarms set currently:%s",alarms.size());
         alarmList = alarms;
-        for(Alarm alarm:alarmList){
+        for (Alarm alarm : alarmList) {
           AlarmDetailsDisplay alarmDetailsDisplay =
-              new AlarmDetailsDisplay(alarm.getRingTime(),alarm.getRepeated());
+              new AlarmDetailsDisplay(alarm.getRingTime(), alarm.getRepeated());
           alarmDetails.add(alarmDetailsDisplay.getAlarmDetailsText());
           alarmEnableDetails.add(alarm.getEnabled());
+          mLayoutManager = new LinearLayoutManager(MainActivity.this.getApplicationContext());
+          mAdapter = new AlarmListAdapter(alarmDetails, alarmEnableDetails);
+          dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+              DividerItemDecoration.VERTICAL);
+
           recyclerView.setHasFixedSize(true);
-          mLayoutManager = new LinearLayoutManager(getApplicationContext());
           recyclerView.setLayoutManager(mLayoutManager);
-          mAdapter = new AlarmListAdapter(alarmDetails,alarmEnableDetails);
+          recyclerView.addItemDecoration(dividerItemDecoration,0);
           recyclerView.setAdapter(mAdapter);
         }
-      }else{
+      } else {
         Timber.d("No alarms set currently");
       }
     });
@@ -260,8 +259,8 @@ public class MainActivity extends AppCompatActivity implements DeleteDialogFragm
 
 
   @Override
-  protected void onStop() {
-    super.onStop();
+  protected void onDestroy() {
+    super.onDestroy();
     HttpResponseCache cache = HttpResponseCache.getInstalled();
     if (cache != null) {
       cache.flush();

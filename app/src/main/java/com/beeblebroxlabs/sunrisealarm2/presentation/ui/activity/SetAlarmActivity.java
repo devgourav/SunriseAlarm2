@@ -4,8 +4,6 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
 import android.Manifest.permission;
-import android.annotation.SuppressLint;
-import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,22 +11,25 @@ import android.content.pm.PackageManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Switch;
-import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -39,14 +40,9 @@ import butterknife.OnClick;
 import com.beeblebroxlabs.sunrisealarm2.R;
 import com.beeblebroxlabs.sunrisealarm2.logic.util.AlarmRingUtil;
 import com.beeblebroxlabs.sunrisealarm2.logic.util.RingtoneNamePathUtil;
-import com.beeblebroxlabs.sunrisealarm2.presentation.ui.activity.MainActivity;
-import com.beeblebroxlabs.sunrisealarm2.presentation.ui.fragment.RepeatAlarmDialogFragment;
-import com.beeblebroxlabs.sunrisealarm2.presentation.ui.fragment.RepeatAlarmDialogFragment.RepeatDialogFragmentListener;
 import com.beeblebroxlabs.sunrisealarm2.repository.local.Alarm;
 import com.beeblebroxlabs.sunrisealarm2.repository.local.AlarmDatabase;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -54,7 +50,7 @@ import timber.log.BuildConfig;
 import timber.log.Timber;
 import timber.log.Timber.DebugTree;
 
-public class SetAlarmActivity extends AppCompatActivity implements RepeatDialogFragmentListener {
+public class SetAlarmActivity extends AppCompatActivity{
 
   private static final int CONVERT_TO_13UNIX_TIME = 1000;
   private static final int REQUEST_READ_EXTERNAL_STORAGE = 100;
@@ -64,14 +60,14 @@ public class SetAlarmActivity extends AppCompatActivity implements RepeatDialogF
   @BindView(R.id.customTimeSwitch)
   Switch customTimeSwitch;
 
-
-
-
   @BindView(R.id.sunriseTimeSwitch)
   Switch sunriseTimeSwitch;
 
   @BindView(R.id.ringtoneButton)
   Button ringtoneButton;
+
+  @BindView(R.id.ringtoneNameTextView)
+  TextView ringtoneNameTextView;
 
   @BindView(R.id.alarmLabelEditText)
   EditText alarmLabelEditText;
@@ -82,10 +78,15 @@ public class SetAlarmActivity extends AppCompatActivity implements RepeatDialogF
   @BindView(R.id.sunriseTimeTextView)
   TextView sunriseTimeTextView;
 
+  @BindView(R.id.repeatSpinner)
+  Spinner spinner;
+
   Calendar sunriseTime,alarmTime,currentTime;
   private Menu menu;
   Intent ringtoneIntent;
   Uri alarmUri;
+  int repeated;
+  RingtoneNamePathUtil ringtoneNamePathUtil;
 
 
   @Override
@@ -108,16 +109,59 @@ public class SetAlarmActivity extends AppCompatActivity implements RepeatDialogF
     currentTime = Calendar.getInstance(TimeZone.getDefault());
 
     alarmUri = null;
+    ringtoneNamePathUtil = new RingtoneNamePathUtil(getApplicationContext());
 
     if(sunriseTime!=null){
-      DateFormat dateFormat = DateFormat.getTimeInstance(DateFormat.MEDIUM,current);
+      DateFormat dateFormat = DateFormat.getTimeInstance(DateFormat.SHORT,current);
       sunriseTimeTextView.setText("Today's sunrise at " + dateFormat.format(sunriseTime.getTime()));
     }else{
-      sunriseTimeTextView.setText("Sunrise Time could not be fetched");
+      sunriseTimeTextView.setText("Not available");
     }
 
     sunriseTimeSwitch.setText("Set sunrise time");
     customTimeSwitch.setText("Set custom time");
+
+
+    ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+        R.array.repeat_array, android.R.layout.simple_spinner_item);
+    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    spinner.setAdapter(adapter);
+
+    spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+      @Override
+      public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+          switch(i){
+            case 0:
+              repeated=0;
+              break;
+            case 1:
+              repeated=1;
+              break;
+            case 2:
+              repeated=2;
+              break;
+            case 3:
+              repeated=3;
+              break;
+            default:
+              repeated=0;
+              break;
+          }
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> adapterView) {
+
+      }
+    });
+
+    alarmLabelEditText.setOnFocusChangeListener((view, b) -> {
+      if(view.getId() == R.id.alarmLabelEditText && !b) {
+        InputMethodManager inputMethodManager =  (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
+      }
+    });
 
   }
 
@@ -163,7 +207,12 @@ public class SetAlarmActivity extends AppCompatActivity implements RepeatDialogF
       showOptionMenu(R.id.okButton);
       showOptionMenu(R.id.cancelButton);
 
-      alarmTime.setTimeInMillis(sunriseTime.getTimeInMillis());
+      if(sunriseTime==null){
+        sunriseTimeSwitch.setEnabled(FALSE);
+      }else{
+        sunriseTimeSwitch.setEnabled(TRUE);
+        alarmTime.setTimeInMillis(sunriseTime.getTimeInMillis());
+      }
 
       if(alarmTime.compareTo(currentTime) <=0 ){
         alarmTime.add(Calendar.DATE,1);
@@ -201,6 +250,7 @@ public class SetAlarmActivity extends AppCompatActivity implements RepeatDialogF
     setRingtoneIntentData();
   }
 
+
   /*------------------------------------Event listeners end-------------------------------------------------------------------------*/
 
 
@@ -215,22 +265,46 @@ public class SetAlarmActivity extends AppCompatActivity implements RepeatDialogF
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
+    String alarmRealPathUri;
     switch(item.getItemId()){
       case (R.id.okButton):
         if(sunriseTimeSwitch.isEnabled() || customTimeSwitch.isEnabled()){
-          FragmentManager manager = getSupportFragmentManager();
-          new RepeatAlarmDialogFragment().show(manager,"RepeatAlarm");
+          Alarm alarm = new Alarm();
+
+          alarm.setLabel(alarmLabelEditText.getText().toString());
+          alarm.setSetTime(currentTime.getTimeInMillis());
+          alarm.setRingTime(alarmTime.getTimeInMillis());
+          alarm.setEnabled(TRUE);
+          alarm.setRepeated(repeated);
+
+          if(alarmUri == null) {
+            SharedPreferences sharedPreferences = PreferenceManager
+                .getDefaultSharedPreferences(this);
+            String sysDefaultAlarmTone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+                .toString();
+            String alarmUriString = sharedPreferences
+                .getString("default_alarmTone", sysDefaultAlarmTone);
+            alarmUri = Uri.parse(alarmUriString);
+          }
+          alarm.setTunePath(alarmUri.toString());
+
+
+          new DatabaseInsert(this,alarm).execute();
+
+          new AlarmRingUtil(getApplicationContext()).setAlarmRingIntent(alarm);
+
         }else{
           Toast.makeText(this, "Please select time", Toast.LENGTH_SHORT).show();
         }
         break;
       case (R.id.cancelButton):
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
         break;
     }
+    Intent intent = new Intent(this, MainActivity.class);
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+    startActivity(intent);
     return super.onOptionsItemSelected(item);
+
   }
 
 
@@ -255,43 +329,6 @@ public class SetAlarmActivity extends AppCompatActivity implements RepeatDialogF
 
    /*----------------------------------Menu creation/modification code end--------------------------------------------------------*/
 
-  /*-----------------------------------Dialog Fragment creation start-------------------------------------------------------------*/
-  public void onClickDialogListener(int result) {
-    Alarm alarm = new Alarm();
-
-    alarm.setLabel(alarmLabelEditText.getText().toString());
-    alarm.setSetTime(currentTime.getTimeInMillis());
-    alarm.setRingTime(alarmTime.getTimeInMillis());
-    alarm.setEnabled(TRUE);
-
-
-    if(alarmUri == null){
-      alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-    }
-    alarm.setTunePath(alarmUri.toString());
-
-    switch (result){
-      case (RESULT_OK):
-        alarm.setRepeated(TRUE);
-        break;
-      case (RESULT_CANCELED):
-        alarm.setRepeated(FALSE);
-        break;
-    }
-
-
-    new DatabaseInsert(this,alarm).execute();
-
-
-    new AlarmRingUtil(getApplicationContext()).setAlarmRingIntent(alarm);
-
-    Intent intent = new Intent(this, MainActivity.class);
-    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-    startActivity(intent);
-  }
-
-  /*-----------------------------------Dialog Fragment creation end-----------------------------------*/
-
   /*-----------------------------------Permissions logic start-----------------------------------*/
 
   @Override
@@ -311,20 +348,21 @@ public class SetAlarmActivity extends AppCompatActivity implements RepeatDialogF
 
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    RingtoneNamePathUtil nameUtil = new RingtoneNamePathUtil(getApplicationContext());
     String alarmToneName=" ";
     switch (requestCode) {
       case REQUEST_READ_EXTERNAL_STORAGE:
         if (resultCode == RESULT_OK) {
           alarmUri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
           if(alarmUri!=null){
-            alarmToneName = nameUtil.getFileName(alarmUri);
+            alarmToneName = ringtoneNamePathUtil.getFileName(alarmUri);
           }
-          ringtoneButton.setText(alarmToneName);
+          ringtoneNameTextView.setText(alarmToneName);
         }
         break;
     }
   }
+
+
 
   private static class DatabaseInsert extends AsyncTask<Void,Void,Long>{
     Alarm alarm;
@@ -345,7 +383,7 @@ public class SetAlarmActivity extends AppCompatActivity implements RepeatDialogF
 
     @Override
     protected void onPostExecute(Long id) {
-      Timber.d("Alarm inserted into db:"+id);
+      Timber.d("Alarm inserted into db:%s",id);
     }
   }
 

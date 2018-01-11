@@ -22,7 +22,7 @@ public class ShowAlarmViewModel extends ViewModel {
   }
 
   public LiveData<List<Alarm>> getAlarms(){
-    alarms = alarmDatabase.alarmDao().loadAll();
+    alarms = alarmDatabase.alarmDao().loadAsync();
     return alarms;
   }
 

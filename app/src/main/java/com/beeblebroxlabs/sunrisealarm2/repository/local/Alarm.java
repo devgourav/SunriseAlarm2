@@ -1,8 +1,6 @@
 package com.beeblebroxlabs.sunrisealarm2.repository.local;
 
-import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -21,7 +19,7 @@ public class Alarm implements Parcelable {
   private long setTime;
   private long ringTime;
   private String tunePath;
-  private Boolean isRepeated;
+  private int repeated;
   private Boolean isEnabled;
 
   public Alarm() {}
@@ -32,8 +30,7 @@ public class Alarm implements Parcelable {
     setTime = in.readLong();
     ringTime = in.readLong();
     tunePath = in.readString();
-    byte tmpIsRepeated = in.readByte();
-    isRepeated = tmpIsRepeated == 0 ? null : tmpIsRepeated == 1;
+    repeated  = in.readInt();
     byte tmpIsEnabled = in.readByte();
     isEnabled = tmpIsEnabled == 0 ? null : tmpIsEnabled == 1;
   }
@@ -90,12 +87,12 @@ public class Alarm implements Parcelable {
     this.tunePath = tunePath;
   }
 
-  public Boolean getRepeated() {
-    return isRepeated;
+  public int getRepeated() {
+    return repeated;
   }
 
-  public void setRepeated(Boolean repeated) {
-    isRepeated = repeated;
+  public void setRepeated(int repeated) {
+    this.repeated = repeated;
   }
 
   public Boolean getEnabled() {
@@ -118,11 +115,11 @@ public class Alarm implements Parcelable {
     parcel.writeLong(setTime);
     parcel.writeLong(ringTime);
     parcel.writeString(tunePath);
-    parcel.writeByte((byte) (isRepeated == null ? 0 : isRepeated ? 1 : 2));
+    parcel.writeInt(repeated);
     parcel.writeByte((byte) (isEnabled == null ? 0 : isEnabled ? 1 : 2));
   }
 
   public String toString(){
-    return "Id"+getId()+"Label"+getLabel()+"RingTime"+getRingTime()+"SetTime"+getSetTime()+"Emabled"+getEnabled()+"Repeated"+getRepeated()+"tunePath"+getTunePath();
+    return "Id"+getId()+"Label"+getLabel()+"RingTime"+getRingTime()+"SetTime"+getSetTime()+"Enabled"+getEnabled()+"Repeated"+getRepeated()+"tunePath"+getTunePath();
   }
 }

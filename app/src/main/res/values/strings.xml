@@ -4,4 +4,11 @@
   <string name="pref_ringtone_silent">Silent</string>
   <string name="pref_title_vibrate">Vibrate</string>
   <string name="activity_btn_transition">transition</string>
+  <string name="repeat">Repeat</string>
+  <string-array name="repeat_array">
+    <item>Once</item>
+    <item>WeekDays(Mon,Tue,Wed,Thur,Fri)</item>
+    <item>Weekends(Sat,Sun)</item>
+    <item>EveryDay</item>
+  </string-array>
 </resources>

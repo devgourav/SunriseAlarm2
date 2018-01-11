@@ -11,7 +11,6 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import com.beeblebroxlabs.sunrisealarm2.logic.AlarmBroadcastReceiver;
 import com.beeblebroxlabs.sunrisealarm2.repository.local.Alarm;
-import timber.log.Timber;
 
 /**
  *Sets AlarmManger with the alarm Time and a pending Intent
@@ -37,16 +36,14 @@ public class AlarmRingUtil {
     PendingIntent pendingIntent = PendingIntent
         .getBroadcast(mContext,requestCode,alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-    if(alarm.getRepeated()){
-      alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,alarm.getRingTime(), AlarmManager.INTERVAL_DAY,pendingIntent);
-    }else{
+    if(alarm.getRepeated()==0){
       if (VERSION.SDK_INT >= VERSION_CODES.M) {
         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,alarm.getRingTime(),pendingIntent);
       }else{
         alarmManager.set(AlarmManager.RTC_WAKEUP,alarm.getRingTime(),pendingIntent);
       }
+    }else{
+      alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,alarm.getRingTime(), AlarmManager.INTERVAL_DAY,pendingIntent);
     }
-
-
   }
 }

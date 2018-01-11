@@ -18,10 +18,10 @@ import java.util.List;
 public interface AlarmDao {
 
   @Query("select * from alarm")
-  LiveData<List<Alarm>> loadAll();
+  LiveData<List<Alarm>> loadAsync();
 
-  @Query("select * from alarm where id = :id")
-  LiveData<Alarm> load(int id);
+  @Query("select * from alarm")
+  List<Alarm> loadSync();
 
   @Insert(onConflict = IGNORE)
   long insert(Alarm alarm);

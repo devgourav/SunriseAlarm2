@@ -2,8 +2,6 @@
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
-  android:background="#fff"
   tools:context="com.beeblebroxlabs.sunrisealarm2.presentation.ui.activity.AlarmRingActivity">
 
   <TextView
@@ -11,7 +9,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/topMargin"
-    android:fontFamily="sans-serif-condensed"
     android:gravity="center"
     android:textColor="@color/colorAccent"
     android:textSize="@dimen/textSizeLarge" />
@@ -22,25 +19,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="@dimen/topMargin"
-    android:fontFamily="sans-serif-condensed"
+
     android:gravity="center"
     android:keepScreenOn="true"
     android:textColor="@color/colorAccent"
     android:textSize="@dimen/textSizeLarge"  />
 
-  <com.airbnb.lottie.LottieAnimationView
-    android:id="@+id/animation_view"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    app:lottie_fileName="hello-world.json"
-    app:lottie_loop="true"
-    app:lottie_autoPlay="true" />
-
-
   <LinearLayout
     style="?android:attr/buttonBarStyle"
     android:layout_width="match_parent"
     android:layout_height="50dp"
+    android:layout_marginBottom="@dimen/topMargin"
     android:layout_gravity="bottom|center_horizontal"
     android:orientation="horizontal"
     android:weightSum="2.0">
@@ -50,8 +39,9 @@
       android:layout_width="0dp"
       android:layout_height="match_parent"
       android:layout_weight="1"
-      android:fontFamily="sans-serif-condensed"
+      android:gravity="center"
       android:textColor="@color/colorAccent"
+      android:textSize="@dimen/textSizeExtraSmall"
       android:text="Stop Alarm"/>
     <Button
       android:id="@+id/snoozeButton"
@@ -59,8 +49,9 @@
       android:layout_width="0dp"
       android:layout_height="match_parent"
       android:layout_weight="1"
-      android:fontFamily="sans-serif-condensed"
+      android:gravity="center"
       android:textColor="@color/colorAccent"
+      android:textSize="@dimen/textSizeExtraSmall"
       android:text="Snooze for 10 minutes" />
   </LinearLayout>
 
