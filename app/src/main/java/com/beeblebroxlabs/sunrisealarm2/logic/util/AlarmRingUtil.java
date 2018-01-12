@@ -13,37 +13,49 @@ import com.beeblebroxlabs.sunrisealarm2.logic.AlarmBroadcastReceiver;
 import com.beeblebroxlabs.sunrisealarm2.repository.local.Alarm;
 
 /**
- *Sets AlarmManger with the alarm Time and a pending Intent
+ * Sets AlarmManger with the alarm Time and a pending Intent
  */
 
 public class AlarmRingUtil {
-  private Context mContext;
 
-  public AlarmRingUtil(Context mContext) {
+  private Context mContext;
+  Alarm alarm;
+  Intent alarmIntent;
+  AlarmManager alarmManager;
+  PendingIntent pendingIntent;
+
+  public AlarmRingUtil(Context mContext, Alarm alarm) {
     this.mContext = mContext;
+    this.alarm = alarm;
   }
 
-  public void setAlarmRingIntent(Alarm alarm){
-    System.out.println("AlarmRingUtil:"+alarm.toString());
-    AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(ALARM_SERVICE);
-    Intent alarmIntent = new Intent(mContext,AlarmBroadcastReceiver.class);
+  public void setAlarmIntent() {
+    System.out.println("AlarmRingUtil:" + alarm.toString());
+    alarmManager = (AlarmManager) mContext.getSystemService(ALARM_SERVICE);
+    alarmIntent = new Intent(mContext, AlarmBroadcastReceiver.class);
 
     int requestCode = alarm.getId();
     Bundle args = new Bundle();
-    args.putParcelable("ALARM",alarm);
-    alarmIntent.putExtra("DATA",args);
+    args.putParcelable("ALARM", alarm);
+    alarmIntent.putExtra("DATA", args);
 
-    PendingIntent pendingIntent = PendingIntent
-        .getBroadcast(mContext,requestCode,alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+    pendingIntent = PendingIntent
+        .getBroadcast(mContext, requestCode, alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+  }
 
-    if(alarm.getRepeated()==0){
-      if (VERSION.SDK_INT >= VERSION_CODES.M) {
-        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,alarm.getRingTime(),pendingIntent);
-      }else{
-        alarmManager.set(AlarmManager.RTC_WAKEUP,alarm.getRingTime(),pendingIntent);
-      }
-    }else{
-      alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,alarm.getRingTime(), AlarmManager.INTERVAL_DAY,pendingIntent);
+  public void setSingleAlarm() {
+    setAlarmIntent();
+    if (VERSION.SDK_INT >= VERSION_CODES.M) {
+      alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarm.getRingTime(),
+          pendingIntent);
+    } else {
+      alarmManager.set(AlarmManager.RTC_WAKEUP, alarm.getRingTime(), pendingIntent);
     }
+  }
+
+  public void setRepeatingAlarm(long interval) {
+    setAlarmIntent();
+    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, alarm.getRingTime(),interval,
+            pendingIntent);
   }
 }

@@ -38,7 +38,6 @@ public class DeleteAlarmDialogFragment extends DialogFragment {
   }
 
   public interface DeleteDialogFragmentListener {
-
     void onClickDeleteDialogListener(int result, int position);
   }
 }

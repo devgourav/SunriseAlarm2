@@ -1,4 +1,4 @@
-package com.beeblebroxlabs.sunrisealarm2.presentation;
+package com.beeblebroxlabs.sunrisealarm2.presentation.ui;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;

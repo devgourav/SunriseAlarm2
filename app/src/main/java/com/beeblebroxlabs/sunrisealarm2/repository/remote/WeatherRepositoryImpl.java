@@ -4,9 +4,14 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import com.beeblebroxlabs.sunrisealarm2.SunriseApplication;
 import com.beeblebroxlabs.sunrisealarm2.repository.remote.pojoModel.CurrentWeather;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import okhttp3.Cache;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.internal.http.BridgeInterceptor;
+import okhttp3.internal.http.RetryAndFollowUpInterceptor;
 import okhttp3.logging.HttpLoggingInterceptor;
 import okhttp3.logging.HttpLoggingInterceptor.Level;
 import retrofit2.Call;
@@ -29,18 +34,21 @@ public class WeatherRepositoryImpl implements WeatherRepository{
 
   private static final Interceptor REWRITE_CACHE_CONTROL_INTERCEPTOR = chain -> {
     okhttp3.Response originalResponse = chain.proceed(chain.request());
-    return originalResponse.newBuilder()
-        .header("Cache-Control", "max-age="+MAX_AGE)
-        .build();
+      return originalResponse.newBuilder()
+          .header("Cache-Control", "public, max-age=" + MAX_AGE)
+          .build();
   };
 
 
   public WeatherRepositoryImpl() {
     Cache cache = new Cache(SunriseApplication.getAppContext().getCacheDir(), cacheSize);
     OkHttpClient okHttpClient = new OkHttpClient.Builder()
+        .addInterceptor(new ConnectivityInterceptor(SunriseApplication.getAppContext()))
         .addInterceptor(new HttpLoggingInterceptor().setLevel(Level.BODY))
         .addInterceptor(REWRITE_CACHE_CONTROL_INTERCEPTOR)
         .cache(cache)
+        .connectTimeout(60, TimeUnit.SECONDS)
+        .retryOnConnectionFailure(true)
         .build();
 
     Retrofit retrofit = new Retrofit.Builder()
@@ -63,11 +71,6 @@ public class WeatherRepositoryImpl implements WeatherRepository{
     currentWeatherCall.enqueue(new Callback<CurrentWeather>() {
       @Override
       public void onResponse(Call<CurrentWeather> call, Response<CurrentWeather> response) {
-        if(response.raw().cacheResponse()!=null){
-          Timber.d("Response from cache...");
-        }else if(response.raw().networkResponse()!=null){
-          Timber.d("Response from server...");
-        }
         liveData.setValue(new ApiResponse(response.body()));
       }
 

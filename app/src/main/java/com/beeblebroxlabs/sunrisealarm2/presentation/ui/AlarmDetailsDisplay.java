@@ -1,5 +1,7 @@
 package com.beeblebroxlabs.sunrisealarm2.presentation.ui;
 
+import com.beeblebroxlabs.sunrisealarm2.R;
+import com.beeblebroxlabs.sunrisealarm2.SunriseApplication;
 import java.util.Calendar;
 
 /**
@@ -42,25 +44,21 @@ public class AlarmDetailsDisplay {
     hourLeft = (timeDifference % DAYS_IN_MILLIS) / HOUR_IN_MILLIS;
     minuteLeft = (timeDifference % HOUR_IN_MILLIS) / MIN_IN_MILLIS;
 
-    String repeatText="";
 
-    switch (repeated){
-      case 0:
-        repeatText="Once";
-        break;
-      case 1:
-        repeatText="MON|TUE|WED|THUR|FRI";
-        break;
-      case 2:
-        repeatText="SAT|SUN";
-        break;
-    }
+    String timeLeftText="";
+
 
     if(dayLeft>0){
-      return "Alarm in "+dayLeft+" days "+hourLeft+" hours "+minuteLeft+" minutes " + repeatText;
+      timeLeftText = "Alarm in "+dayLeft+" days "+hourLeft+" hours "+minuteLeft+" minutes ";
     }else{
-      return "Alarm in "+hourLeft+" hours "+minuteLeft+" minutes " +repeatText;
+      timeLeftText = "Alarm in "+hourLeft+" hours "+minuteLeft+" minutes ";
     }
+    return timeLeftText;
+
+  }
+
+  public String getAlarmRepeatText(){
+    return SunriseApplication.getAppContext().getResources().getStringArray(R.array.repeat_array)[repeated];
   }
 
 }

@@ -5,6 +5,7 @@
   <string name="pref_title_vibrate">Vibrate</string>
   <string name="activity_btn_transition">transition</string>
   <string name="repeat">Repeat</string>
+  <string name="delete">DELETE</string>
   <string-array name="repeat_array">
     <item>Once</item>
     <item>WeekDays(Mon,Tue,Wed,Thur,Fri)</item>

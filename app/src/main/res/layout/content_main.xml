@@ -3,8 +3,8 @@
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  android:padding="10dp"
   style="@style/AppTheme"
+  android:background="@color/colorBackgroundLight"
   tools:context="com.beeblebroxlabs.sunrisealarm2.presentation.ui.activity.MainActivity">
 
 
@@ -16,7 +16,6 @@
     android:layout_alignParentEnd="true"
     android:layout_alignParentStart="true"
     android:layout_alignParentTop="true"
-
     android:gravity="center_horizontal"
     android:textColor="@color/ColorTextDark"
     android:textSize="@dimen/textSizeLarge" />
@@ -27,7 +26,6 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/topMargin"
     android:layout_below="@+id/clockText"
-
     android:gravity="center_horizontal"
     android:textAlignment="center"
     android:textColor="@color/ColorTextDark"

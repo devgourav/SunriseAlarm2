@@ -1,27 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="36dp"
-    android:layout_marginTop="10dp"
-    android:layout_gravity="top|center_horizontal"
-    android:orientation="horizontal"
-    android:weightSum="2.0">
-    <TextView
-      android:id="@+id/alarmDetailsTextView"
-      android:layout_width="wrap_content"
-      android:layout_height="match_parent"
-      android:layout_weight="1.5"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="46dp"
+  android:orientation="vertical"
+  android:background="@color/colorBackgroundLight">
+  <include layout="@layout/swipe_row_item"/>
+  <include layout="@layout/regular_row_item"/>
+</FrameLayout>
 
-      android:gravity="start"
-      android:textSize="@dimen/textSizeExtraSmall" />
-    <Switch
-      android:id="@+id/alarmSwitch"
-      android:layout_width="wrap_content"
-      android:layout_height="match_parent"
-      android:layout_weight="0.5"
 
-      android:gravity="end" />
-  </LinearLayout>
 
 
 

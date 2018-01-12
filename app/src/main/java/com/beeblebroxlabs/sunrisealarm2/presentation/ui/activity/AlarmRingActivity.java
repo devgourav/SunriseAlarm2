@@ -25,6 +25,7 @@ import butterknife.OnClick;
 import com.beeblebroxlabs.sunrisealarm2.R;
 import com.beeblebroxlabs.sunrisealarm2.logic.AlarmBroadcastReceiver;
 import com.beeblebroxlabs.sunrisealarm2.logic.AlarmRingtonePlayingService;
+import com.beeblebroxlabs.sunrisealarm2.logic.util.AlarmRingUtil;
 import com.beeblebroxlabs.sunrisealarm2.repository.local.Alarm;
 import com.beeblebroxlabs.sunrisealarm2.repository.local.AlarmDatabase;
 import timber.log.BuildConfig;
@@ -54,6 +55,7 @@ public class AlarmRingActivity extends AppCompatActivity {
   Intent alarmRingtoneService;
   Alarm alarm;
   protected static WakeLock wakeLock = null;
+  AlarmRingUtil alarmRingUtil;
 
 
   @Override
@@ -99,8 +101,6 @@ public class AlarmRingActivity extends AppCompatActivity {
   @OnClick(R.id.snoozeButton)
   public void snoozeButtonListener(){
     stopService(alarmRingtoneService);
-    PendingIntent alarmPendingIntent;
-    AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
     Alarm newAlarm = alarm;
     newAlarm.setRingTime(alarm.getRingTime()+SNOOZE_TIME);
 
@@ -113,13 +113,8 @@ public class AlarmRingActivity extends AppCompatActivity {
 
     new DatabaseUpdate(this,alarm).execute();
 
-    alarmPendingIntent = PendingIntent.getBroadcast(AlarmRingActivity.this,newAlarm.getId(),
-        newAlarmIntent,PendingIntent.FLAG_CANCEL_CURRENT);
-    if (VERSION.SDK_INT >= VERSION_CODES.M) {
-      alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,newAlarm.getRingTime(),alarmPendingIntent);
-    }else{
-      alarmManager.set(AlarmManager.RTC_WAKEUP,newAlarm.getRingTime(),alarmPendingIntent);
-    }
+    alarmRingUtil = new AlarmRingUtil(getApplicationContext(),newAlarm);
+    alarmRingUtil.setSingleAlarm();
 
    startMainActivity();
   }

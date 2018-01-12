@@ -4,6 +4,7 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
 import android.Manifest.permission;
+import android.app.AlarmManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,6 +22,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnFocusChangeListener;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -37,6 +39,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
+import butterknife.OnFocusChange;
+import butterknife.OnItemSelected;
 import com.beeblebroxlabs.sunrisealarm2.R;
 import com.beeblebroxlabs.sunrisealarm2.logic.util.AlarmRingUtil;
 import com.beeblebroxlabs.sunrisealarm2.logic.util.RingtoneNamePathUtil;
@@ -54,8 +58,6 @@ public class SetAlarmActivity extends AppCompatActivity{
 
   private static final int CONVERT_TO_13UNIX_TIME = 1000;
   private static final int REQUEST_READ_EXTERNAL_STORAGE = 100;
-
-  View rootLayout;
 
   @BindView(R.id.customTimeSwitch)
   Switch customTimeSwitch;
@@ -87,6 +89,7 @@ public class SetAlarmActivity extends AppCompatActivity{
   Uri alarmUri;
   int repeated;
   RingtoneNamePathUtil ringtoneNamePathUtil;
+  AlarmRingUtil alarmRingUtil;
 
 
   @Override
@@ -99,8 +102,6 @@ public class SetAlarmActivity extends AppCompatActivity{
     ButterKnife.bind(this);
     this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-
-    final Intent intent = getIntent();
 
     sunriseTime = getSunriseTime();
     Locale current = getResources().getConfiguration().locale;
@@ -127,41 +128,6 @@ public class SetAlarmActivity extends AppCompatActivity{
     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     spinner.setAdapter(adapter);
 
-    spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-      @Override
-      public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-          switch(i){
-            case 0:
-              repeated=0;
-              break;
-            case 1:
-              repeated=1;
-              break;
-            case 2:
-              repeated=2;
-              break;
-            case 3:
-              repeated=3;
-              break;
-            default:
-              repeated=0;
-              break;
-          }
-      }
-
-      @Override
-      public void onNothingSelected(AdapterView<?> adapterView) {
-
-      }
-    });
-
-    alarmLabelEditText.setOnFocusChangeListener((view, b) -> {
-      if(view.getId() == R.id.alarmLabelEditText && !b) {
-        InputMethodManager inputMethodManager =  (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-
-      }
-    });
 
   }
 
@@ -251,6 +217,39 @@ public class SetAlarmActivity extends AppCompatActivity{
   }
 
 
+  @OnItemSelected(R.id.repeatSpinner)
+  public void repeatSpinnerItemSelectedListener(AdapterView<?> adapterView, View view, int i, long l){
+    switch(i){
+      case 0:
+        repeated=0;
+        break;
+      case 1:
+        repeated=1;
+        break;
+      case 2:
+        repeated=2;
+        break;
+      case 3:
+        repeated=3;
+        break;
+      default:
+        repeated=0;
+        break;
+    }
+  }
+
+  @OnFocusChange(R.id.alarmLabelEditText)
+  public void ringtoneFocusChangeListener(View view, boolean b){
+    if (view.getId() == R.id.alarmLabelEditText && b) {
+      alarmLabelEditText.setCursorVisible(TRUE);
+    }else if(view.getId() == R.id.alarmLabelEditText && !b){
+        InputMethodManager inputMethodManager = (InputMethodManager) SetAlarmActivity.this
+            .getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+  }
+
+
   /*------------------------------------Event listeners end-------------------------------------------------------------------------*/
 
 
@@ -265,7 +264,6 @@ public class SetAlarmActivity extends AppCompatActivity{
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-    String alarmRealPathUri;
     switch(item.getItemId()){
       case (R.id.okButton):
         if(sunriseTimeSwitch.isEnabled() || customTimeSwitch.isEnabled()){
@@ -291,7 +289,12 @@ public class SetAlarmActivity extends AppCompatActivity{
 
           new DatabaseInsert(this,alarm).execute();
 
-          new AlarmRingUtil(getApplicationContext()).setAlarmRingIntent(alarm);
+          alarmRingUtil = new AlarmRingUtil(getApplicationContext(),alarm);
+          if(repeated==0){
+            alarmRingUtil.setSingleAlarm();
+          }else{
+            alarmRingUtil.setRepeatingAlarm(AlarmManager.INTERVAL_DAY);
+          }
 
         }else{
           Toast.makeText(this, "Please select time", Toast.LENGTH_SHORT).show();
