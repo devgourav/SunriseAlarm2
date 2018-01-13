@@ -6,10 +6,29 @@
   <string name="activity_btn_transition">transition</string>
   <string name="repeat">Repeat</string>
   <string name="delete">DELETE</string>
+  <string name="data_enable_title">Unable to contact weather gods</string>
+  <string name="data_enable_request">Permission to contact weather gods</string>
+  <string name="data_negative_message">Weather gods could not be contacted</string>
+  <string name="sunrise_time_text">Sun will rise at %s</string>
+  <string name="sunrise_time_unavailable_text">Sun god unavailable</string>
+  <string name="sunrise_switch_text">Wake up with the Sun</string>
+  <string name="custom_switch_text">Wake up when you want</string>
+  <string name="select_time_request">Please select a time</string>
+  <string name="ringtone_error_message">"Ringtone could not be Set</string>
+  <string name="select_alarm_tone">Select alarm tone</string>
+  <string name="timeLeftText">Alarm in %d hours %d minutes </string>
+
+  <string name="delete_alarm">Delete Alarm</string>
+  <string name="delete_alarm_positive">OK</string>
+  <string name="delete_alarm_negative">cancel</string>
+  <string name="delete_alarm_toast">Alarm Deleted</string>
+
+
+  <string name="snooze_text">Snooze for %d minutes</string>
   <string-array name="repeat_array">
     <item>Once</item>
-    <item>WeekDays(Mon,Tue,Wed,Thur,Fri)</item>
-    <item>Weekends(Sat,Sun)</item>
+    <!--<item>WeekDays(Mon,Tue,Wed,Thur,Fri)</item>-->
+    <!--<item>Weekends(Sat,Sun)</item>-->
     <item>EveryDay</item>
   </string-array>
 </resources>

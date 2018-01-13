@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.widget.Toast;
+import com.beeblebroxlabs.sunrisealarm2.R;
 
 
 public class DeleteAlarmDialogFragment extends DialogFragment {
@@ -26,13 +27,14 @@ public class DeleteAlarmDialogFragment extends DialogFragment {
     listener = (DeleteDialogFragmentListener) getActivity();
 
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-    builder.setMessage("Delete")
-        .setPositiveButton("OK", (dialog, id) -> {
+    builder.setMessage(getString(R.string.delete_alarm))
+        .setPositiveButton(getString(R.string.delete_alarm_positive), (dialog, id) -> {
           listener.onClickDeleteDialogListener(Activity.RESULT_OK,position);
-          Toast.makeText(getActivity().getApplicationContext(), "Alarm Deleted",
+          Toast.makeText(getActivity().getApplicationContext(),
+              getString(R.string.delete_alarm_toast),
               Toast.LENGTH_SHORT).show();
         })
-        .setNegativeButton("Cancel",
+        .setNegativeButton(getString(R.string.delete_alarm_negative),
             (dialog, id) -> listener.onClickDeleteDialogListener(Activity.RESULT_CANCELED,position));
     return builder.create();
   }

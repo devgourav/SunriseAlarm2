@@ -3,33 +3,32 @@
   <SwitchPreference
     android:defaultValue="false"
 
-    android:textSize="@dimen/textSizeSmall"
     android:key="24hourClock"
     android:summary="Default is 12-hour Clock"
+    android:textSize="@dimen/textSizeSmall"
     android:title="Use 24-hour Clock" />
 
   <RingtonePreference
-    android:defaultValue="default"
-    android:textSize="@dimen/textSizeSmall"
+    android:defaultValue="false"
     android:key="default_alarmTone"
     android:ringtoneType="alarm"
+    android:summary="Default"
+    android:textSize="@dimen/textSizeSmall"
     android:title="Default AlarmTone" />
 
 
   <SwitchPreference
     android:defaultValue="false"
-
-    android:textSize="@dimen/textSizeSmall"
     android:key="temperatureUnit"
     android:summary="Default is Celsius"
+    android:textSize="@dimen/textSizeSmall"
     android:title="Use Fahrenheit" />
 
   <SwitchPreference
     android:defaultValue="false"
-
-    android:textSize="@dimen/textSizeSmall"
     android:key="themePreference"
     android:summary="Default is Metric(Celsius)"
+    android:textSize="@dimen/textSizeSmall"
     android:title="Use Emperical Unit(Fahrenheit)" />
 
 

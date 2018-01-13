@@ -22,11 +22,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnFocusChangeListener;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -84,13 +81,12 @@ public class SetAlarmActivity extends AppCompatActivity{
   Spinner spinner;
 
   Calendar sunriseTime,alarmTime,currentTime;
-  private Menu menu;
   Intent ringtoneIntent;
   Uri alarmUri;
   int repeated;
   RingtoneNamePathUtil ringtoneNamePathUtil;
   AlarmRingUtil alarmRingUtil;
-
+  private Menu menu;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -114,13 +110,14 @@ public class SetAlarmActivity extends AppCompatActivity{
 
     if(sunriseTime!=null){
       DateFormat dateFormat = DateFormat.getTimeInstance(DateFormat.SHORT,current);
-      sunriseTimeTextView.setText("Today's sunrise at " + dateFormat.format(sunriseTime.getTime()));
+      sunriseTimeTextView
+          .setText(getString(R.string.sunrise_time_text, dateFormat.format(sunriseTime.getTime())));
     }else{
-      sunriseTimeTextView.setText("Not available");
+      sunriseTimeTextView.setText(getString(R.string.sunrise_time_unavailable_text));
     }
 
-    sunriseTimeSwitch.setText("Set sunrise time");
-    customTimeSwitch.setText("Set custom time");
+    sunriseTimeSwitch.setText(getString(R.string.sunrise_switch_text));
+    customTimeSwitch.setText(getString(R.string.custom_switch_text));
 
 
     ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -157,7 +154,8 @@ public class SetAlarmActivity extends AppCompatActivity{
     }else{
       ringtoneIntent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
       ringtoneIntent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE,RingtoneManager.TYPE_ALARM);
-      ringtoneIntent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Alarm Tone");
+      ringtoneIntent
+          .putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.select_alarm_tone));
       ringtoneIntent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI,(Uri) null);
       startActivityForResult(ringtoneIntent,REQUEST_READ_EXTERNAL_STORAGE);
     }
@@ -243,9 +241,10 @@ public class SetAlarmActivity extends AppCompatActivity{
     if (view.getId() == R.id.alarmLabelEditText && b) {
       alarmLabelEditText.setCursorVisible(TRUE);
     }else if(view.getId() == R.id.alarmLabelEditText && !b){
-        InputMethodManager inputMethodManager = (InputMethodManager) SetAlarmActivity.this
-            .getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+//        InputMethodManager inputMethodManager = (InputMethodManager) SetAlarmActivity.this
+//            .getSystemService(Context.INPUT_METHOD_SERVICE);
+//        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+      alarmLabelEditText.setCursorVisible(FALSE);
     }
   }
 
@@ -275,7 +274,7 @@ public class SetAlarmActivity extends AppCompatActivity{
           alarm.setEnabled(TRUE);
           alarm.setRepeated(repeated);
 
-          if(alarmUri == null) {
+          if (alarmUri.toString().contains("default") || alarmUri == null) {
             SharedPreferences sharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(this);
             String sysDefaultAlarmTone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
@@ -297,7 +296,7 @@ public class SetAlarmActivity extends AppCompatActivity{
           }
 
         }else{
-          Toast.makeText(this, "Please select time", Toast.LENGTH_SHORT).show();
+          Toast.makeText(this, getString(R.string.select_time_request), Toast.LENGTH_SHORT).show();
         }
         break;
       case (R.id.cancelButton):
@@ -343,7 +342,8 @@ public class SetAlarmActivity extends AppCompatActivity{
         if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
           setRingtoneIntentData();
         }else{
-          Toast.makeText(this, "Ringtone could not be Set.", Toast.LENGTH_SHORT).show();
+          Toast.makeText(this, getString(R.string.ringtone_error_message), Toast.LENGTH_SHORT)
+              .show();
         }
       }
     }
@@ -375,7 +375,7 @@ public class SetAlarmActivity extends AppCompatActivity{
 
     public DatabaseInsert(Context mContext,Alarm alarm) {
       this.alarm = alarm;
-      this.mContext = mContext;
+      this.mContext = mContext.getApplicationContext();
     }
 
     @Override

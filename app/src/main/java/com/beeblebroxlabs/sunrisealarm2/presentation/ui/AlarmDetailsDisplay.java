@@ -9,9 +9,10 @@ import java.util.Calendar;
  */
 
 public class AlarmDetailsDisplay {
-  public static final long MIN_IN_MILLIS = 60000;
-  public static final long HOUR_IN_MILLIS = MIN_IN_MILLIS * 60;
-  public static final long DAYS_IN_MILLIS = HOUR_IN_MILLIS * 24;
+
+  private static final long MIN_IN_MILLIS = 60000;
+  private static final long HOUR_IN_MILLIS = MIN_IN_MILLIS * 60;
+  private static final long DAYS_IN_MILLIS = HOUR_IN_MILLIS * 24;
 
   private Long ringTime;
   private int repeated;
@@ -40,19 +41,18 @@ public class AlarmDetailsDisplay {
       timeDifference = alarmTime.getTimeInMillis()-currTimeInMillis;
     }
 
-    dayLeft = timeDifference / DAYS_IN_MILLIS;
+//    dayLeft = timeDifference / DAYS_IN_MILLIS;
     hourLeft = (timeDifference % DAYS_IN_MILLIS) / HOUR_IN_MILLIS;
     minuteLeft = (timeDifference % HOUR_IN_MILLIS) / MIN_IN_MILLIS;
 
+//    String timeLeftText="";
 
-    String timeLeftText="";
-
-
-    if(dayLeft>0){
-      timeLeftText = "Alarm in "+dayLeft+" days "+hourLeft+" hours "+minuteLeft+" minutes ";
-    }else{
-      timeLeftText = "Alarm in "+hourLeft+" hours "+minuteLeft+" minutes ";
-    }
+//    if(dayLeft>0){
+//      timeLeftText = "Alarm in "+dayLeft+" days "+hourLeft+" hours "+minuteLeft+" minutes ";
+//    }else{
+    String timeLeftText = SunriseApplication.getAppContext().getResources()
+        .getString(R.string.timeLeftText, hourLeft, minuteLeft);
+//    }
     return timeLeftText;
 
   }

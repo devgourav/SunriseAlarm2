@@ -4,7 +4,6 @@ import static com.google.android.gms.location.LocationRequest.PRIORITY_LOW_POWER
 import static java.lang.Boolean.FALSE;
 
 import android.Manifest.permission;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
@@ -14,13 +13,13 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.net.http.HttpResponseCache;
 import android.os.AsyncTask;
 import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
@@ -49,6 +48,7 @@ import com.beeblebroxlabs.sunrisealarm2.presentation.viewmodel.ShowWeatherViewMo
 import com.beeblebroxlabs.sunrisealarm2.repository.local.Alarm;
 import com.beeblebroxlabs.sunrisealarm2.repository.local.AlarmDatabase;
 import com.beeblebroxlabs.sunrisealarm2.repository.remote.pojoModel.CurrentWeather;
+import com.codemybrainsout.ratingdialog.RatingDialog;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -79,24 +79,18 @@ public class MainActivity extends AppCompatActivity implements
   TextView dateText;
   @BindView(R.id.clockText)
   TextClock textClock;
-
-  //Location related variables
-  private FusedLocationProviderClient mFusedLocationProviderClient;
-  private LocationRequest locationRequest;
-  private LocationCallback mLocationCallback;
-
-
   List<Alarm> alarmList;
-
   @BindView(R.id.alarm_recycler_view)
   RecyclerView recyclerView;
   AlarmListAdapter mAdapter;
   RecyclerView.LayoutManager mLayoutManager;
   DividerItemDecoration dividerItemDecoration;
-
   Alarm deletedAlarm;
   int deletedIndex ;
-
+  //Location related variables
+  private FusedLocationProviderClient mFusedLocationProviderClient;
+  private LocationRequest locationRequest;
+  private LocationCallback mLocationCallback;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -127,9 +121,9 @@ public class MainActivity extends AppCompatActivity implements
     buildLocationRequest();
     startLocationService();
     checkDateTimeFormat();
-
     checkNetworkConnection();
     setApplicationCache();
+    showRateDialog();
 
     alarmList = new ArrayList<>();
     prepareAlarmList();
@@ -144,6 +138,7 @@ public class MainActivity extends AppCompatActivity implements
     recyclerView.addItemDecoration(dividerItemDecoration, 0);
     recyclerView.setAdapter(mAdapter);
 
+
   }
 
 
@@ -153,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements
     viewModel = ViewModelProviders.of(this).get(ShowWeatherViewModel.class);
     viewModel.getWeather(location.getLatitude(), location.getLongitude())
         .observe(this, apiResponse -> {
-          if (apiResponse.getError() != null) {
+          if (apiResponse != null) {
             Timber.i(apiResponse.getError());
 //          WeatherText.setText(apiResponse.getError().toString());
           } else {
@@ -205,21 +200,19 @@ public class MainActivity extends AppCompatActivity implements
     }
   }
 
+
   public void prepareAlarmList() {
     ShowAlarmViewModel viewModel;
 
     viewModel = ViewModelProviders.of(this).get(ShowAlarmViewModel.class);
-    viewModel.getAlarms().observe(this, new Observer<List<Alarm>>() {
-      @Override
-      public void onChanged(@Nullable List<Alarm> alarms) {
-        if (alarms.size() > 0) {
-          Timber.i("alarms set currently:%s", alarms.size());
-          alarmList.clear();
-          alarmList.addAll(alarms);
-          mAdapter.notifyDataSetChanged();
-        } else {
-          Timber.i("No alarms set currently");
-        }
+    viewModel.getAlarms().observe(this, alarms -> {
+      if (alarms.size() > 0) {
+        Timber.i("alarms set currently:%s", alarms.size());
+        alarmList.clear();
+        alarmList.addAll(alarms);
+        mAdapter.notifyDataSetChanged();
+      } else {
+        Timber.i("No alarms set currently");
       }
     });
 
@@ -245,6 +238,46 @@ public class MainActivity extends AppCompatActivity implements
         mAdapter.notifyDataSetChanged();
         break;
     }
+  }
+
+  public void showRateDialog() {
+    final RatingDialog ratingDialog = new RatingDialog.Builder(this)
+        .threshold(3)
+        .session(5)
+        .title("How was your experience with us?")
+        .titleTextColor(R.color.ColorTextDark)
+        .positiveButtonText("Not Now")
+        .negativeButtonText("Never")
+        .positiveButtonTextColor(R.color.colorPrimary)
+        .negativeButtonTextColor(R.color.colorPrimary)
+        .formTitle("Submit Feedback")
+        .formHint("Tell us where we can improve")
+        .formSubmitText("Submit")
+        .formCancelText("Cancel")
+        .ratingBarColor(R.color.colorAccent)
+        .onThresholdCleared((ratingDialog1, rating, thresholdCleared) -> {
+          //do something
+          ratingDialog1.dismiss();
+        })
+        .onThresholdFailed((ratingDialog12, rating, thresholdCleared) -> {
+          //do something
+          ratingDialog12.dismiss();
+        })
+        .onRatingChanged((rating, thresholdCleared) -> {
+          final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+          try {
+            startActivity(new Intent(Intent.ACTION_VIEW,
+                Uri.parse("market://details?id=" + getPackageName())));
+          } catch (android.content.ActivityNotFoundException anfe) {
+            startActivity(new Intent(Intent.ACTION_VIEW,
+                Uri.parse("https://play.google.com/store/apps/details?id=" + getPackageName())));
+          }
+        })
+        .onRatingBarFormSumbit(feedback -> {
+          //do something
+        }).build();
+
+    ratingDialog.show();
   }
 
 
@@ -312,12 +345,12 @@ public class MainActivity extends AppCompatActivity implements
 
   public void checkNetworkConnection() {
     if (!isOnline()) { //check if data is enabled or not
-      new Builder(this).setTitle("Unable to connect")
-          .setMessage("Enable data to fetch Weather Details")
+      new Builder(this).setTitle(getString(R.string.data_enable_title))
+          .setMessage(getString(R.string.data_enable_request))
           .setPositiveButton(android.R.string.yes,
               (dialog, i) -> startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS)))
-          .setNegativeButton(android.R.string.no, (dialog, i) -> Toast
-              .makeText(MainActivity.this, "Weather Details could not be fetched",
+          .setNegativeButton(android.R.string.no, (dialog, i) ->
+              Toast.makeText(MainActivity.this, getString(R.string.data_negative_message),
                   Toast.LENGTH_SHORT).show())
           .show();
     } else {
@@ -344,7 +377,7 @@ public class MainActivity extends AppCompatActivity implements
 
     public DatabaseDelete(Context mContext, Alarm alarm) {
       this.alarm = alarm;
-      this.mContext = mContext;
+      this.mContext = mContext.getApplicationContext();
     }
 
     @Override

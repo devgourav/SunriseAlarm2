@@ -2,19 +2,14 @@ package com.beeblebroxlabs.sunrisealarm2.presentation.ui.activity;
 
 import static java.lang.Boolean.FALSE;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.TextClock;
@@ -38,24 +33,21 @@ import timber.log.Timber.DebugTree;
 public class AlarmRingActivity extends AppCompatActivity {
 
 
-  public static final int SNOOZE_TIME = 2*60*1000;//2 Minutes
-
+  private static final int SNOOZE_TIME = 2 * 60 * 1000;
+  private static final int SNOOZE_TIME_MIN = SNOOZE_TIME / 60000;//2 Minutes
+  protected static WakeLock wakeLock = null;
   @BindView(R.id.ringLabelText)
   TextView ringLabelText;
-
   @BindView(R.id.ringTextClock)
   TextClock ringTextClock;
-
   @BindView(R.id.silentButton)
   Button silentButton;
-
   @BindView(R.id.snoozeButton)
   Button snoozeButton;
-
   Intent alarmRingtoneService;
   Alarm alarm;
-  protected static WakeLock wakeLock = null;
   AlarmRingUtil alarmRingUtil;
+  Context context;
 
 
   @Override
@@ -71,6 +63,8 @@ public class AlarmRingActivity extends AppCompatActivity {
     PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
     wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "DoNotSleep");
     wakeLock.acquire();
+
+    context = getApplicationContext();
 
 
 
@@ -94,7 +88,7 @@ public class AlarmRingActivity extends AppCompatActivity {
       ringLabelText.setText(" ");
     }
 
-    snoozeButton.setText("Snooze for "+SNOOZE_TIME/60000+" minutes");
+    snoozeButton.setText(getString(R.string.snooze_text, SNOOZE_TIME_MIN));
 
   }
 
@@ -138,30 +132,30 @@ public class AlarmRingActivity extends AppCompatActivity {
     startActivity(intent);
   }
 
-  private static class DatabaseDelete extends AsyncTask<Void,Void,Void> {
-
-    Alarm alarm;
-    Context mContext;
-    AlarmDatabase alarmDatabase;
-
-
-    public DatabaseDelete(Context context, Alarm alarm) {
-      this.alarm = alarm;
-      this.mContext = context.getApplicationContext();
-    }
-
-    @Override
-    protected Void doInBackground(Void... voids) {
-      alarmDatabase = AlarmDatabase.getInstance(mContext);
-      alarmDatabase.alarmDao().deleteObject(alarm);
-      return null;
-    }
-  }
-
   @Override
   protected void onDestroy() {
     super.onDestroy();
     wakeLock.release();
+  }
+
+  private static class DatabaseDelete extends AsyncTask<Void,Void,Void> {
+
+    Alarm alarm;
+    AlarmDatabase alarmDatabase;
+    Context context;
+
+
+    public DatabaseDelete(Context context, Alarm alarm) {
+      this.alarm = alarm;
+      this.context = context.getApplicationContext();
+    }
+
+    @Override
+    protected Void doInBackground(Void... voids) {
+      alarmDatabase = AlarmDatabase.getInstance(context);
+      alarmDatabase.alarmDao().deleteObject(alarm);
+      return null;
+    }
   }
 
   private static class DatabaseUpdate extends AsyncTask<Void,Void,Void> {
